@@ -51,5 +51,6 @@ async fn get_diagnostics(
 
     let response = telnet.execute("dumpmdm").await?;
 
-    Ok(response)
+    // Hack to fix extraneous newlines in mini-telnet output.
+    Ok(response.replace("\n\n", "\n"))
 }
