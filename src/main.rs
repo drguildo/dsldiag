@@ -49,7 +49,7 @@ async fn get_diagnostics(
         .await?;
     telnet.login(username, password).await?;
 
-    let response = telnet.execute("xdslctl info").await?;
+    let response = telnet.execute("dumpmdm").await?;
 
     Ok(response)
 }
