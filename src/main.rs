@@ -28,13 +28,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let username = matches.value_of("username").unwrap();
     let password = matches.value_of("password").unwrap();
 
-    let diagnostics = get_diagnostics(ip, port, username, password).await?;
-    println!("{}", diagnostics);
+    let dumpmdm_xml = get_dumpmdm_xml(ip, port, username, password).await?;
+    let dumpmdm_xml_parsed = roxmltree::Document::parse(&dumpmdm_xml).unwrap();
+    println!(
+        "XML document has {} descendants",
+        dumpmdm_xml_parsed.descendants().count()
+    );
+
+    let dumpmdm_dsl_interface_config = dumpmdm_xml_parsed
+        .descendants()
+        .find(|n| n.has_tag_name("WANDSLInterfaceConfig"))
+        .unwrap();
+    println!(
+        "WANDSLInterfaceConfig node has {} descendants",
+        dumpmdm_dsl_interface_config.descendants().count()
+    );
 
     Ok(())
 }
 
-async fn get_diagnostics(
+async fn get_dumpmdm_xml(
     ip: &str,
     port: &str,
     username: &str,
