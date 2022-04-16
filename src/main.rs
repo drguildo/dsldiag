@@ -28,26 +28,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let username = matches.value_of("username").unwrap();
     let password = matches.value_of("password").unwrap();
 
-    let dumpmdm_xml = get_dumpmdm_xml(ip, port, username, password).await?;
-    let dumpmdm_xml_parsed = roxmltree::Document::parse(&dumpmdm_xml).unwrap();
-    println!(
-        "XML document has {} descendants",
-        dumpmdm_xml_parsed.descendants().count()
-    );
-
-    let dumpmdm_dsl_interface_config = dumpmdm_xml_parsed
-        .descendants()
-        .find(|n| n.has_tag_name("WANDSLInterfaceConfig"))
-        .unwrap();
-    println!(
-        "WANDSLInterfaceConfig node has {} descendants",
-        dumpmdm_dsl_interface_config.descendants().count()
-    );
+    let xdslctl_info_stats = get_xdslctl_info_stats(ip, port, username, password).await?;
+    println!("{}", xdslctl_info_stats);
 
     Ok(())
 }
 
-async fn get_dumpmdm_xml(
+async fn get_xdslctl_info_stats(
     ip: &str,
     port: &str,
     username: &str,
@@ -65,11 +52,8 @@ async fn get_dumpmdm_xml(
     // Fetch output of dumpmdm command, skipping the "Dump of Entire MDM, this is NOT the config
     // file" line at the beginning.
     let response = telnet
-        .execute("dumpmdm")
+        .execute("xdslctl info --stats")
         .await?
-        .lines()
-        .skip(1)
-        .collect::<String>()
         // Workaround for extraneous newlines in mini-telnet output.
         .replace("\n\n", "\n");
 

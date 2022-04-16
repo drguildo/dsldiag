@@ -6,5 +6,4 @@ edition = "2021"
 [dependencies]
 clap = { version = "3", features = ["cargo"] }
 mini-telnet = "0.1.7"
-roxmltree = "0.14.1"
 tokio = { version = "1", features = ["full"] }
